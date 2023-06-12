@@ -1,0 +1,120 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job stats:
+job         count    min threads    max threads
+--------  -------  -------------  -------------
+all             1              1              1
+simple_A        3              1              1
+simple_B        3              1              1
+simple_C        1              1              1
+total           8              1              1
+
+Select jobs to execute...
+
+[Mon Jun 12 20:30:49 2023]
+rule simple_A:
+    output: out_A/3.txt
+    jobid: 7
+    reason: Missing output files: out_A/3.txt
+    wildcards: sample=3
+    resources: tmpdir=/tmp
+
+[Mon Jun 12 20:30:49 2023]
+Finished job 7.
+1 of 8 steps (12%) done
+Select jobs to execute...
+
+[Mon Jun 12 20:30:49 2023]
+rule simple_B:
+    input: out_A/3.txt
+    output: out_B/3.txt
+    jobid: 6
+    reason: Missing output files: out_B/3.txt; Input files updated by another job: out_A/3.txt
+    wildcards: sample=3
+    resources: tmpdir=/tmp
+
+[Mon Jun 12 20:30:49 2023]
+Finished job 6.
+2 of 8 steps (25%) done
+Select jobs to execute...
+
+[Mon Jun 12 20:30:49 2023]
+rule simple_A:
+    output: out_A/1.txt
+    jobid: 3
+    reason: Missing output files: out_A/1.txt
+    wildcards: sample=1
+    resources: tmpdir=/tmp
+
+[Mon Jun 12 20:30:49 2023]
+Finished job 3.
+3 of 8 steps (38%) done
+Select jobs to execute...
+
+[Mon Jun 12 20:30:49 2023]
+rule simple_A:
+    output: out_A/2.txt
+    jobid: 5
+    reason: Missing output files: out_A/2.txt
+    wildcards: sample=2
+    resources: tmpdir=/tmp
+
+[Mon Jun 12 20:30:49 2023]
+Finished job 5.
+4 of 8 steps (50%) done
+Select jobs to execute...
+
+[Mon Jun 12 20:30:49 2023]
+rule simple_B:
+    input: out_A/2.txt
+    output: out_B/2.txt
+    jobid: 4
+    reason: Missing output files: out_B/2.txt; Input files updated by another job: out_A/2.txt
+    wildcards: sample=2
+    resources: tmpdir=/tmp
+
+[Mon Jun 12 20:30:49 2023]
+Finished job 4.
+5 of 8 steps (62%) done
+Select jobs to execute...
+
+[Mon Jun 12 20:30:49 2023]
+rule simple_B:
+    input: out_A/1.txt
+    output: out_B/1.txt
+    jobid: 2
+    reason: Missing output files: out_B/1.txt; Input files updated by another job: out_A/1.txt
+    wildcards: sample=1
+    resources: tmpdir=/tmp
+
+[Mon Jun 12 20:30:49 2023]
+Finished job 2.
+6 of 8 steps (75%) done
+Select jobs to execute...
+
+[Mon Jun 12 20:30:49 2023]
+rule simple_C:
+    input: out_B/1.txt, out_B/2.txt, out_B/3.txt
+    output: simple_C_out.txt
+    jobid: 1
+    reason: Missing output files: simple_C_out.txt; Input files updated by another job: out_B/3.txt, out_B/1.txt, out_B/2.txt
+    resources: tmpdir=/tmp
+
+[Mon Jun 12 20:30:49 2023]
+Finished job 1.
+7 of 8 steps (88%) done
+Select jobs to execute...
+
+[Mon Jun 12 20:30:49 2023]
+localrule all:
+    input: simple_C_out.txt
+    jobid: 0
+    reason: Input files updated by another job: simple_C_out.txt
+    resources: tmpdir=/tmp
+
+[Mon Jun 12 20:30:49 2023]
+Finished job 0.
+8 of 8 steps (100%) done
+Complete log: .snakemake/log/2023-06-12T203049.480331.snakemake.log

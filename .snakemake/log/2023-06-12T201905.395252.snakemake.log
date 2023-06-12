@@ -1,0 +1,3 @@
+NameError in line 8 of /home/boas/experiments/snakemake_modules/main.smk:
+name 'github' is not defined
+  File "/home/boas/experiments/snakemake_modules/main.smk", line 8, in <module>
