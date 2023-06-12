@@ -9,7 +9,7 @@ rule all:
 
 module simple:
     snakefile:
-        github("boasvdp/snakemake_modules", path="library/simple.smk", commit="b28e8c3")
+        github("boasvdp/snakemake_playground", path="modules/library/simple.smk", branch="master")
 
 use rule A, B, C from simple as simple_*
 
