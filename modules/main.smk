@@ -1,5 +1,5 @@
 from snakemake.utils import min_version
-min_version("6.0")
+min_version("6.14")
 
 SAMPLES = ["4", "5", "6"]
 
