@@ -2,7 +2,7 @@ SAMPLES = ['1', '2', '3']
 
 rule all:
     input:
-        expand("out_C.txt"
+        expand("out_C.txt")
 
 rule A:
     output:
