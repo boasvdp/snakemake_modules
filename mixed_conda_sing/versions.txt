@@ -1,0 +1,7 @@
++ singularity --version
+singularity-ce version 3.10.4-dirty
++ snakemake --version
+7.26.0
++ mamba --version
+mamba 1.4.2
+conda 23.3.1
