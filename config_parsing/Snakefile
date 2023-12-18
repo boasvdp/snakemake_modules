@@ -1,0 +1,46 @@
+IDS = ["A", "B"]
+
+
+configfile: "config.yaml"
+
+
+expected_kfolders = [
+    temp(directory("kfolder/{sample}/" + f"K{kmer_size}"))
+    for kmer_size in config["kmer_size"].split(",")
+]
+
+
+rule all:
+    input:
+        expand("data/{sample}.spades.fasta", sample=IDS),
+
+
+rule fastp:
+    input:
+        r1="data/{sample}_R1.fq",
+        r2="data/{sample}_R2.fq",
+    output:
+        r1="data/{sample}_R1.fastp.fq",
+        r2="data/{sample}_R2.fastp.fq",
+    shell:
+        "cp {input.r1} {output.r1} && cp {input.r2} {output.r2}"
+
+
+rule spades:
+    input:
+        r1="data/{sample}_R1.fastp.fq",
+        r2="data/{sample}_R2.fastp.fq",
+    output:
+        assembly="data/{sample}.spades.fasta",
+        kfolders=expected_kfolders,
+    params:
+        kmer_size=config["kmer_size"].split(","),
+    shell:
+        """
+        echo {params.kmer_size}
+        cat {input.r1} {input.r2} > {output.assembly}
+        for file in {output.kfolders}
+        do
+            mkdir $file
+        done
+        """
