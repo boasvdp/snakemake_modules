@@ -1,0 +1,4 @@
+tool	container	conda	version_command
+fastqc	docker://staphb/fastqc:0.11.9	envs/fastqc.yaml	fastqc --version
+skesa	docker://staphb/skesa:2.4.0	envs/skesa.yaml	skesa --version
+abricate	docker://staphb/abricate:1.0.1-insaflu-220727	envs/abricate.yaml	abricate --version

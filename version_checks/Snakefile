@@ -1,0 +1,78 @@
+import pandas as pd
+
+(IDS,) = glob_wildcards("data/{sample}_R1.fastq.gz")
+
+output = str(config["output"])
+
+software_env_df = pd.read_csv("software_environments.tsv", sep="\t", index_col="tool")
+software_environments = software_env_df.to_dict(orient="index")
+
+
+rule all:
+    input:
+        expand(output + "/fastqc/{sample}_R{read}_fastqc.html", sample=IDS, read=[1, 2]),
+        expand(output + "/skesa/{sample}_skesa.fasta", sample=IDS),
+        expand(output + "/abricate/{sample}_abricate.tsv", sample=IDS),
+        expand(output + "/versions/{tool}.txt", tool=software_environments.keys()),
+
+
+rule fastqc:
+    input:
+        "data/{sample}_R{read}.fastq.gz",
+    output:
+        html=output + "/fastqc/{sample}_R{read}_fastqc.html",
+        zip=output + "/fastqc/{sample}_R{read}_fastqc.zip",
+    conda:
+        software_environments["fastqc"]["conda"]
+    container:
+        software_environments["fastqc"]["container"]
+    params:
+        outdir=output + "/fastqc",
+    shell:
+        """
+        fastqc {input} -o {params.outdir}
+        """
+
+
+rule skesa:
+    input:
+        "data/{sample}_R1.fastq.gz",
+        "data/{sample}_R2.fastq.gz",
+    output:
+        output + "/skesa/{sample}_skesa.fasta",
+    conda:
+        software_environments["skesa"]["conda"]
+    container:
+        software_environments["skesa"]["container"]
+    shell:
+        "skesa --fastq {input} --contigs_out {output}"
+
+
+rule abricate:
+    input:
+        output + "/skesa/{sample}_skesa.fasta",
+    output:
+        output + "/abricate/{sample}_abricate.tsv",
+    conda:
+        software_environments["abricate"]["conda"]
+    container:
+        software_environments["abricate"]["container"]
+    shell:
+        "abricate {input} > {output}"
+
+
+for tool in software_environments.keys():
+
+    rule:
+        conda:
+            software_environments[tool]["conda"]
+        container:
+            software_environments[tool]["container"]
+        output:
+            output + f"/versions/{tool}.txt",
+        params:
+            version_command=software_environments[tool]["version_command"],
+        shell:
+            """
+            {params.version_command} > {output}
+            """

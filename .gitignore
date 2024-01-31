@@ -1,3 +1,5 @@
 **/.snakemake
-**/output
+**/output*
 conda_env_test
+**/.java
+**/.cache
