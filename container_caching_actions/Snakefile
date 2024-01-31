@@ -1,0 +1,12 @@
+rule all:
+    input:
+        "output/whalesay.txt",
+
+
+rule whalesay:
+    output:
+        "output/whalesay.txt",
+    container:
+        "docker://docker/whalesay"
+    shell:
+        "cowsay moo > {output}"
