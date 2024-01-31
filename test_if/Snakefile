@@ -1,0 +1,18 @@
+rule all:
+  input:
+    "out.txt"
+
+rule A:
+  output:
+    "out.txt"
+  params:
+    run_in_container="False"
+  shell:
+    """
+if [ {params.run_in_container} == True ]
+then
+  echo yes > {output}
+else
+  echo no > {output}
+fi
+    """
