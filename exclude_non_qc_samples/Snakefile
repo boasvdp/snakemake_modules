@@ -1,0 +1,105 @@
+configfile: "config.yaml"
+
+
+(SAMPLES,) = glob_wildcards("data/{sample}.fastq")
+
+import os
+import logging
+
+
+def aggregate_input(wildcards):
+    checkpoint_wc = checkpoints.qc_map_decision.get(**wildcards)
+    logging.warning(f"{checkpoint_wc=}")
+    checkpoint_output = checkpoint_wc.output[0]
+    logging.warning(f"{checkpoint_output=}")
+    pattern = os.path.join(checkpoint_output, "{sample_passed}.bam")
+    logging.warning(f"{pattern=}")
+    globbed_wc = glob_wildcards(pattern)
+    logging.warning(f"{globbed_wc=}")
+    samples_passed = globbed_wc.sample_passed
+    logging.warning(f"{samples_passed=}")
+    return expand(
+        "output/qc/{sample_passed}.txt",
+        sample_passed=samples_passed,
+    )
+
+
+rule all:
+    input:
+        "report.tsv",
+
+
+rule map:
+    input:
+        "data/{sample}.fastq",
+    output:
+        "output/mapped/{sample}.bam",
+    shell:
+        "wc -l {input} > {output}"
+
+
+rule qc_map:
+    input:
+        expand("output/mapped/{sample}.bam", sample=SAMPLES),
+    output:
+        "output/qc_map.txt",
+    shell:
+        """
+bash qc_map.sh {input} > {output}
+        """
+
+
+checkpoint qc_map_decision:
+    input:
+        agg="output/qc_map.txt",
+        map=expand("output/mapped/{sample}.bam", sample=SAMPLES),
+    output:
+        directory("output/qc_passed"),
+    params:
+        min_lines=2,
+    shell:
+        """
+python qc_map_decision.py \
+--input {input.map} \
+--min_lines {params.min_lines} \
+--agg {input.agg} \
+--output {output}
+        """
+
+
+rule call_variants:
+    input:
+        "output/qc_passed/{sample_passed}.bam",
+    output:
+        "output/variants/{sample_passed}.vcf",
+    shell:
+        "echo 'calling variants for {input} and writing to {output}' > {output}"
+
+
+rule qc_variants:
+    input:
+        "output/variants/{sample_passed}.vcf",
+    output:
+        "output/qc/{sample_passed}.txt",
+    shell:
+        "echo 'qc {input} and write results to {output}' > {output}"
+
+
+rule report:
+    input:
+        aggregate_input,
+        # expand("output/qc/{sample}.txt", sample=SAMPLES),
+        # check_lines,
+        # qc=branch(
+        #     check_lines,
+        #     then="output/qc/{sample}.txt",
+        #     otherwise=None,
+        # ),
+        # fastq=expand("data/{sample}.fastq", sample=SAMPLES),
+    output:
+        "report.tsv",
+    shell:
+        """
+echo {wildcards}
+echo 'generating report from {input} and writing to {output}' > {output}
+        """
